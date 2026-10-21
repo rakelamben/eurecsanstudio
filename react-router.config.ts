@@ -1,7 +1,8 @@
 import type { Config } from "@react-router/dev/config";
 
 export default {
-  // Config options...
-  // Server-side render by default, to enable SPA mode set this to `false`
-  ssr: true,
+  // This portfolio has no runtime loaders or actions, so static output is
+  // sufficient and avoids requiring a Vercel server adapter.
+  ssr: false,
+  prerender: true,
 } satisfies Config;
