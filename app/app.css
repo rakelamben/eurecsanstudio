@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Koulen", "Arial Narrow", Impact, sans-serif;
+  
+}
+
+:root {
+  --brand-red: #F02D19;
+}
+
+html,
+body {
+  /* @apply bg-white dark:bg-gray-950;
+
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  } */
+}

@@ -1,0 +1,21 @@
+.sky-background {
+  --sky-top: #009DD6;
+  --sky-bottom: #d9f3ff;
+
+  position:fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 50% 20%,
+      rgba(255, 255, 255, 0.35),
+      transparent 45%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--sky-top),
+      var(--sky-bottom)
+    );
+  z-index: -1;
+}
