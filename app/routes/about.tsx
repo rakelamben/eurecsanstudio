@@ -1,5 +1,8 @@
+import type { RouteHandle } from "~/types/RouteTypes";
 import type { Route } from "./+types/about";
-import { ComingSoon } from "~/features/portofolio/sections/Handling/ComingSoon";
+import { About } from "~/features/portofolio/sections/About/About";
+import { color } from "three/tsl";
+import LogoABout from "~/assets/logos/LOGO_ABOUT.svg"
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,10 +11,19 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+
+export const handle: RouteHandle = {
+  navbar: {
+    logo: LogoABout,
+    color: "text-(--brand-red)"
+  }
+}
+
+
 export default function AboutRoute() {
     return (
-        <main>
-            <ComingSoon />
-        </main>
+        <section>
+            <About></About>
+        </section>
     )
 }

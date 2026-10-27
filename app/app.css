@@ -3,11 +3,14 @@
 @theme {
   --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Koulen", "Arial Narrow", Impact, sans-serif;
-  
+  --font-accent: "Lexend", Impact, sans-serif;
 }
 
 :root {
   --brand-red: #F02D19;
+  --brand-white: #FCFEFF;
+  --brand-green:#046738;
+  --brand-yellow: #FED325
 }
 
 html,

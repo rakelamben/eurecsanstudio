@@ -15,7 +15,7 @@ export function RoadMirrorGlass() {
         type="button"
         onClick={() => setIsModalOpen(true)}
         aria-label="Open fisheye camera"
-        className="sm:hidden pointer-events-auto aspect-[140/140] h-[calc(25dvh-4rem)] lg:[calc(50dvh-4rem)] w-fit absolute bottom-4 right-2 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
+        className="sm:hidden cursor-pointer pointer-events-auto aspect-[140/140] h-[calc(25dvh-4rem)] lg:[calc(50dvh-4rem)] w-fit absolute bottom-4 right-2 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
       >
         <RoadMirrorGlassSource />
       </button>

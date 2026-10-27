@@ -110,7 +110,7 @@ export function FisheyeCameraModal({
             type="button"
             onClick={onClose}
             aria-label="Close camera modal"
-            className="rounded-full bg-white p-2"
+            className="rounded-full bg-white p-2 cursor-pointer"
           >
             <SiClose className="h-8 w-8" />
           </button>

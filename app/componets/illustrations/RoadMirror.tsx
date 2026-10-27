@@ -12,7 +12,7 @@ export function RoadMirror() {
       <button 
         aria-label="Road mirror illustration"
         onClick={() => setIsModalOpen(true)}
-        className="hidden sm:block pointer-events-auto absolute bottom-0 left-1/2 z-10 aspect-[447/622] h-[calc(60dvh-2rem)] lg:h-[calc(65dvh-2rem)] translate-x-1/8 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
+        className="hidden cursor-pointer sm:block pointer-events-auto absolute bottom-0 left-1/2 z-10 aspect-[447/622] h-[calc(60dvh-2rem)] lg:h-[calc(65dvh-2rem)] translate-x-1/8 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
         role="img"
       >
         <RoadMirrorSource/>
