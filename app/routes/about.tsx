@@ -1,7 +1,7 @@
 import type { RouteHandle } from "~/types/RouteTypes";
 import type { Route } from "./+types/about";
 import { About } from "~/features/portofolio/sections/About/About";
-import { color } from "three/tsl";
+
 import LogoABout from "~/assets/logos/LOGO_ABOUT.svg"
 
 export function meta({}: Route.MetaArgs) {

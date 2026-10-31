@@ -7,6 +7,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { Navbar } from "./componets/layout/Navbar";
+import { PageTransition } from "./transition/PageTransition";
+import { GsapScrollSmoother } from "./componets/layout/ScrollSmoother";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -35,8 +37,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Navbar></Navbar>
-        {children}
+        <PageTransition>
+          <Navbar />
+          {children}
+        </PageTransition>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -45,7 +49,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <GsapScrollSmoother>
+      <Outlet />
+    </GsapScrollSmoother>
+  ) 
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

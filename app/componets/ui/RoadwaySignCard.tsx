@@ -1,14 +1,15 @@
-import { div } from "three/tsl"
+
 import { ArrowUpLeft } from "~/assets/illustrations/ArrowUpLeft"
 import { DistanceSign } from "~/assets/illustrations/DistanceSign"
 import { RoadwaySignGrid } from "~/assets/illustrations/RoadwaySignGrid"
 
 type RoadwayCardSignProps = {
     services?:string,
+    onSeeMore?: () => void,
     className?: string
 }
 
-export function RoadwayCardSign( {className = "", services = ""}: RoadwayCardSignProps  )  {
+export function RoadwayCardSign({ className = "", services = "", onSeeMore }: RoadwayCardSignProps) {
     return (
         <div className="flex flex-col items-center">
             <div className={`relative z-7 flex flex-col space-y-[5px] justify-start items-start w-fit ${className}`}>
@@ -26,9 +27,13 @@ export function RoadwayCardSign( {className = "", services = ""}: RoadwayCardSig
                         </div>
                         <p className="font-bold text-3xl text-center">{services}</p>
                     </div>
-                    <div className="bg-(--brand-yellow) py-2 rounded-b-2xl">
+                    <button
+                        type="button"
+                        onClick={onSeeMore}
+                        className="w-full cursor-pointer rounded-b-2xl bg-(--brand-yellow) py-2"
+                    >
                         <p className="font-bold text-2xl tracking-widest text-center ">SEE MORE</p>
-                    </div>
+                    </button>
                 </div>
             </div>
             <RoadwaySignGrid className="relative z-5 -mt-6"/>
