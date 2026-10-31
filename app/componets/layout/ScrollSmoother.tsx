@@ -20,7 +20,7 @@ export function GsapScrollSmoother({ children }: GsapScrollSmootherProps) {
 
     return (
         <div id="smooth-wrapper">
-            <div id="smooth-content" className="will-change-transform [transform:translateZ(0)] [backface-visibility:hidden]">
+            <div id="smooth-content" className="min-h-screen will-change-transform [transform:translateZ(0)] [backface-visibility:hidden]">
                 {children}
             </div>
         </div>

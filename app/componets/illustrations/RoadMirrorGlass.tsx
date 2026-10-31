@@ -2,11 +2,15 @@ import { useState } from "react";
 import { RoadMirrorGlassSource } from "../../assets/illustrations/RoadMirrorGlassSource";
 import { FisheyeCameraModal } from "../ui/FisheyeCameraModal";
 
+interface RoadMirrorGlassProps {
+  className?: string;
+}
+
 /**
  * The sign is rendered from the editable React SVG source so its individual
  * elements can become interactive without replacing the illustration asset.
  */
-export function RoadMirrorGlass() {
+export function RoadMirrorGlass({ className = "" }: RoadMirrorGlassProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -15,7 +19,7 @@ export function RoadMirrorGlass() {
         type="button"
         onClick={() => setIsModalOpen(true)}
         aria-label="Open fisheye camera"
-        className="sm:hidden cursor-pointer pointer-events-auto aspect-[140/140] h-[calc(25dvh-4rem)] lg:[calc(50dvh-4rem)] w-fit absolute bottom-4 right-2 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
+        className={`sm:hidden cursor-pointer pointer-events-auto aspect-[140/140] h-[calc(25dvh-4rem)] lg:[calc(50dvh-4rem)] w-fit absolute bottom-4 right-2 [&>svg]:block [&>svg]:h-full [&>svg]:w-full ${className}`}
       >
         <RoadMirrorGlassSource />
       </button>

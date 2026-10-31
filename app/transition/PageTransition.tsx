@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { createPortal } from "react-dom";
-import { gsap, useGSAP, ScrollSmoother, ScrollTrigger } from "~/lib/gsap";
+import { gsap, ScrollSmoother, ScrollTrigger } from "~/lib/gsap";
 
 type RouteSignConfig = {
     badge: string;
@@ -45,10 +45,11 @@ const routeSigns: Record<string, RouteSignConfig> = {
 };
 
 function getSignConfig(path: string): RouteSignConfig {
+    const cleanPath = path.split(/[?#]/)[0];
     return (
-        routeSigns[path] || {
+        routeSigns[cleanPath] || {
             badge: "EXPRESS",
-            title: path.replace("/", "").toUpperCase() || "DESTINATION",
+            title: cleanPath.replace("/", "").toUpperCase() || "DESTINATION",
             subtitle: "ROADWAY CORRIDOR",
             code: "RDW-00",
         }
@@ -81,6 +82,10 @@ export function PageTransition({ children }: { children: ReactNode }) {
     const slatsRef = useRef<(HTMLDivElement | null)[]>([]);
     const badgeRef = useRef<HTMLDivElement>(null);
     const activeTlRef = useRef<gsap.core.Timeline | null>(null);
+
+    // Tracks target route waiting to mount in the DOM
+    const pendingDestinationRef = useRef<string | null>(null);
+    const isSlatsClosedRef = useRef(false);
     const prevLocationKeyRef = useRef(location.key);
 
     useEffect(() => {
@@ -92,26 +97,20 @@ export function PageTransition({ children }: { children: ReactNode }) {
         };
     }, []);
 
-    const navigateTo = (to: string) => {
-        if (location.pathname === to) return;
-        if (isTransitioning) return;
-
-        const sign = getSignConfig(to);
-        setTargetSign(sign);
-        setIsTransitioning(true);
-
+    /**
+     * Phase 1: Flip IN (Close mechanical slats over current page)
+     */
+    const playSlatsClose = (onComplete: () => void) => {
         if (!overlayRef.current) {
-            navigate(to);
+            onComplete();
             return;
         }
 
-        // Kill any pending timeline
         if (activeTlRef.current && activeTlRef.current.isActive()) {
             activeTlRef.current.kill();
         }
 
         const validSlats = slatsRef.current.filter(Boolean);
-
         const smoother = (() => {
             try {
                 return ScrollSmoother.get();
@@ -120,16 +119,13 @@ export function PageTransition({ children }: { children: ReactNode }) {
             }
         })();
 
-        const tl = gsap.timeline({
-            onComplete: () => {
-                setIsTransitioning(false);
-                gsap.set(overlayRef.current, { autoAlpha: 0, pointerEvents: "none" });
-            },
-        });
+        if (smoother) {
+            try {
+                smoother.paused(true);
+            } catch {}
+        }
 
-        activeTlRef.current = tl;
-
-        // 1. Prepare overlay & 3D slats
+        // Set initial positions for closing flip
         gsap.set(overlayRef.current, { autoAlpha: 1, pointerEvents: "auto" });
         gsap.set(validSlats, {
             rotateX: -90,
@@ -141,13 +137,15 @@ export function PageTransition({ children }: { children: ReactNode }) {
             gsap.set(badgeRef.current, { scale: 0.7, opacity: 0 });
         }
 
-        if (smoother) {
-            try {
-                smoother.paused(true);
-            } catch {}
-        }
+        const tl = gsap.timeline({
+            onComplete: () => {
+                isSlatsClosedRef.current = true;
+                onComplete();
+            },
+        });
+        activeTlRef.current = tl;
 
-        // 2. Mechanical Trivision Slats Wave Flip IN (Close screen)
+        // Mechanical Trivision Slats wave flip shut
         tl.to(validSlats, {
             rotateX: 0,
             opacity: 1,
@@ -169,35 +167,70 @@ export function PageTransition({ children }: { children: ReactNode }) {
             );
         }
 
-        // 3. MIDPOINT: The screen is 100% COVERED by closed mechanical slats!
-        // Perform the redirect now while completely hidden!
-        tl.add(() => {
-            navigate(to);
-            window.scrollTo(0, 0);
-            if (smoother) {
-                try {
-                    smoother.scrollTop(0);
-                    smoother.paused(false);
-                } catch {}
-            }
-            try {
-                ScrollTrigger.refresh();
-            } catch {}
-        });
+        // Brief mechanical settle
+        tl.to({}, { duration: 0.04 });
+    };
 
-        // 4. Brief mechanical pause (0.08s)
-        tl.to({}, { duration: 0.1 });
+    /**
+     * Phase 2: Flip OUT (Open mechanical slats ONLY after Page 2 is mounted)
+     */
+    const playSlatsOpen = (onComplete?: () => void) => {
+        if (!overlayRef.current) {
+            setIsTransitioning(false);
+            onComplete?.();
+            return;
+        }
+
+        if (activeTlRef.current && activeTlRef.current.isActive()) {
+            activeTlRef.current.kill();
+        }
+
+        const validSlats = slatsRef.current.filter(Boolean);
+
+        const tl = gsap.timeline({
+            onComplete: () => {
+                setIsTransitioning(false);
+                isSlatsClosedRef.current = false;
+                pendingDestinationRef.current = null;
+                gsap.set(overlayRef.current, { autoAlpha: 0, pointerEvents: "none" });
+
+                const smoother = (() => {
+                    try {
+                        return ScrollSmoother.get();
+                    } catch {
+                        return null;
+                    }
+                })();
+                if (smoother) {
+                    try {
+                        smoother.scrollTo(0, false);
+                    } catch {}
+                }
+                const smoothContent = document.getElementById("smooth-content");
+                if (smoothContent && location.pathname === "/") {
+                    gsap.set(smoothContent, { y: 0, clearProps: "transform" });
+                }
+                try {
+                    ScrollTrigger.refresh();
+                } catch {}
+                onComplete?.();
+            },
+        });
+        activeTlRef.current = tl;
+
+        // Brief hold so the destination route sign can be comfortably read
+        tl.to({}, { duration: 0.12 });
 
         if (badgeRef.current) {
             tl.to(badgeRef.current, {
                 scale: 0.8,
                 opacity: 0,
-                duration: 0.15,
+                duration: 0.16,
                 ease: "power2.in",
             });
         }
 
-        // 5. Mechanical Trivision Slats Wave Flip OUT (Open and reveal new page)
+        // Slats flip open to reveal the already-mounted Page 2
         tl.to(
             validSlats,
             {
@@ -211,35 +244,121 @@ export function PageTransition({ children }: { children: ReactNode }) {
         );
     };
 
-    // Browser back/forward button support
-    useGSAP(
-        () => {
-            if (prevLocationKeyRef.current === location.key) return;
-            prevLocationKeyRef.current = location.key;
+    /**
+     * Navigation Trigger: Closes slats over Page 1, then calls navigate(to).
+     * Slats STAY CLOSED until Page 2 has finished rendering in the DOM!
+     */
+    const navigateTo = (to: string) => {
+        const cleanPath = to.split(/[?#]/)[0];
+        if (location.pathname === cleanPath) return;
+        if (isTransitioning) return;
 
-            // If browser back/forward was pressed and no animation is running, do a fast settle
-            if (!isTransitioning && overlayRef.current) {
-                const validSlats = slatsRef.current.filter(Boolean);
-                gsap.set(overlayRef.current, { autoAlpha: 1, pointerEvents: "auto" });
-                gsap.set(validSlats, { rotateX: 0, opacity: 1 });
+        const sign = getSignConfig(to);
+        setTargetSign(sign);
+        setIsTransitioning(true);
+        pendingDestinationRef.current = cleanPath;
+        isSlatsClosedRef.current = false;
 
-                const tl = gsap.timeline({
-                    onComplete: () => {
-                        gsap.set(overlayRef.current, { autoAlpha: 0, pointerEvents: "none" });
-                    },
-                });
+        playSlatsClose(() => {
+            // Screen is 100% covered by the closed billboard slats!
+            // Start loading Page 2 while completely hidden behind the billboard
+            navigate(to);
+        });
+    };
 
-                tl.to(validSlats, {
-                    rotateX: 90,
-                    opacity: 0,
-                    duration: 0.35,
-                    stagger: 0.04,
-                    ease: "power3.in",
+    /**
+     * Watches for Page 2 to actually mount in the DOM.
+     * When React Router commits the new route component, we reset scroll and open the slats.
+     */
+    useEffect(() => {
+        if (pendingDestinationRef.current) {
+            const cleanCurrent = location.pathname.split(/[?#]/)[0];
+
+            if (cleanCurrent === pendingDestinationRef.current) {
+                // PAGE 2 IS MOUNTED IN THE DOM!
+                pendingDestinationRef.current = null;
+
+                // 1. Unpause smoother and instantly snap to top without lerp/smoothing
+                const smoother = (() => {
+                    try {
+                        return ScrollSmoother.get();
+                    } catch {
+                        return null;
+                    }
+                })();
+                if (smoother) {
+                    try {
+                        smoother.paused(false);
+                        smoother.scrollTo(0, false);
+                        smoother.scrollTop(0);
+                    } catch {}
+                }
+
+                // 2. Reset native window scroll
+                window.scrollTo(0, 0);
+
+                // 3. For Home ("/") or any clean reset, ensure #smooth-content is pinned at y: 0
+                const smoothContent = document.getElementById("smooth-content");
+                if (smoothContent && cleanCurrent === "/") {
+                    gsap.set(smoothContent, { y: 0, clearProps: "transform" });
+                }
+
+                // 4. Refresh ScrollTrigger measurements
+                try {
+                    ScrollTrigger.refresh();
+                } catch {}
+
+                // Double requestAnimationFrame ensures browser paints Page 2 before slats open
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        playSlatsOpen();
+                    });
                 });
             }
-        },
-        { dependencies: [location.key] },
-    );
+        } else {
+            // Browser back / forward button handling
+            if (prevLocationKeyRef.current !== location.key) {
+                prevLocationKeyRef.current = location.key;
+                window.scrollTo(0, 0);
+                const smoother = (() => {
+                    try {
+                        return ScrollSmoother.get();
+                    } catch {
+                        return null;
+                    }
+                })();
+                if (smoother) {
+                    try {
+                        smoother.paused(false);
+                        smoother.scrollTo(0, false);
+                        smoother.scrollTop(0);
+                    } catch {}
+                }
+                const smoothContent = document.getElementById("smooth-content");
+                if (smoothContent && location.pathname === "/") {
+                    gsap.set(smoothContent, { y: 0, clearProps: "transform" });
+                }
+                try {
+                    ScrollTrigger.refresh();
+                } catch {}
+            }
+        }
+    }, [location.pathname, location.key]);
+
+    // Safety timeout: If route takes > 4.5s (e.g. offline/network error), reveal page
+    useEffect(() => {
+        if (!isTransitioning || !pendingDestinationRef.current) return;
+
+        const timer = setTimeout(() => {
+            if (pendingDestinationRef.current) {
+                console.warn("Navigation timeout, revealing page");
+                pendingDestinationRef.current = null;
+                playSlatsOpen();
+            }
+        }, 4500);
+
+        return () => clearTimeout(timer);
+    }, [isTransitioning]);
 
     return (
         <TransitionContext.Provider value={{ navigateTo, isTransitioning }}>
@@ -271,7 +390,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
                                             slatsRef.current[index] = el;
                                         }}
                                         style={{ transformStyle: "preserve-3d" }}
-                                        className="border-2 border-[#ABABAB] flex-1 w-full bg-gradient-to-b from-[#067a43] via-[#046738] to-[#024a27] relative flex items-center justify-center shadow-lg -mt-[5px] last:mb-0"
+                                        className="flex-1 w-full bg-gradient-to-b from-[#067a43] via-[#046738] to-[#024a27] border-b-2 border-black relative flex items-center justify-center shadow-lg -mt-[2px] last:mb-0"
                                     >
                                         {/* Top hazard stripe on first slat */}
                                         {/* {isTop && (
@@ -285,15 +404,19 @@ export function PageTransition({ children }: { children: ReactNode }) {
                                         )} */}
 
                                         {/* Left & Right mechanical bolt rivets */}
-                                        <div className="absolute left-6 flex flex-col gap-1.5 opacity-60 z-5 ">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                                        <div className="absolute left-8 flex flex-col gap-2 z-10">
+                                            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-zinc-100 via-zinc-400 to-zinc-700 border border-black shadow-[0_1px_3px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                                                <div className="w-1 h-1 rounded-full bg-black/60" />
+                                            </div>
                                         </div>
-                                        <div className="absolute right-6 flex flex-col gap-1.5 opacity-60 z-5 ">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                                        <div className="absolute right-8 flex flex-col gap-2 z-10">
+                                            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-zinc-100 via-zinc-400 to-zinc-700 border border-black shadow-[0_1px_3px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                                                <div className="w-1 h-1 rounded-full bg-black/60" />
+                                            </div>
                                         </div>
 
                                         {/* Slat groove line */}
-                                        <div className="absolute inset-x-12 top-0 h-[1px]" />
+                                        <div className="absolute inset-x-12 top-0 h-[2px] bg-[#ABABAB]" />
 
                                         {/* Mechanical Route Destination Display on Middle Slat */}
                                         {isCenter && (
@@ -349,8 +472,9 @@ export function TransitionLink({
     [key: string]: unknown;
 }) {
     const location = useLocation();
-    const { navigateTo } = usePageTransition();
-    const isActive = location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
+    const { navigateTo, isTransitioning } = usePageTransition();
+    const cleanTo = to.split(/[?#]/)[0];
+    const isActive = location.pathname === cleanTo || (cleanTo !== "/" && location.pathname.startsWith(cleanTo));
 
     const computedClassName = typeof className === "function" ? className({ isActive }) : className;
 
@@ -363,7 +487,9 @@ export function TransitionLink({
         e.preventDefault();
         onClick?.();
 
-        if (location.pathname !== to) {
+        if (isTransitioning) return;
+
+        if (location.pathname !== cleanTo) {
             navigateTo(to);
         }
     };

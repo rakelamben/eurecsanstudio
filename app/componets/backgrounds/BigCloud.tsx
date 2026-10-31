@@ -1,8 +1,12 @@
 import BIG_CLOUD from "~/assets/illustrations/BIG_CLOUD.png"
 
-export function BigCloud() {
+interface BigCloudProps {
+    className?: string;
+}
+
+export function BigCloud({ className = "" }: BigCloudProps) {
     return (
-        <div className="fixed opacity-[0.9] w-full overflow-hidden h-full z-[-1] pointer-events-none">
+        <div className={`fixed opacity-[0.9] w-full overflow-hidden h-full z-[-1] pointer-events-none ${className}`}>
             <img
                 src={BIG_CLOUD}
                 alt="Awan besar"
