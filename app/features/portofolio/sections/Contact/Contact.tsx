@@ -7,6 +7,8 @@ import { LogoLinkedin } from "~/assets/logos/LOGO_LINKEDIN"
 import { LogoGithub } from "~/assets/logos/LOGO_GITHUB"
 import { Link } from "react-router"
 import { sendContactEmail, type IdeaType } from "~/lib/emailjs";
+import { FeedbackToast, type FeedbackData } from "./FeedbackToast";
+
 
 function ContactFormComponent() {
     const [name, setName] = useState("");
@@ -15,7 +17,7 @@ function ContactFormComponent() {
     const [message, setMessage] = useState("");
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+    const [feedback, setFeedback] = useState<FeedbackData | null>(null);
 
     const handleClear = () => {
         setName("");
@@ -27,18 +29,18 @@ function ContactFormComponent() {
 
     const validateForm = () => {
         if (!name.trim() || name.trim().length < 2) {
-            setFeedback({ type: "error", text: "Please enter your name (minimum 2 characters)." });
+            setFeedback({ id: Date.now(), type: "error", text: "Please enter your name (minimum 2 characters)." });
             return false;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email.trim() || !emailRegex.test(email.trim())) {
-            setFeedback({ type: "error", text: "Please enter a valid email address." });
+            setFeedback({ id: Date.now(), type: "error", text: "Please enter a valid email address." });
             return false;
         }
 
         if (!message.trim() || message.trim().length < 5) {
-            setFeedback({ type: "error", text: "Please describe your idea or project (minimum 5 characters)." });
+            setFeedback({ id: Date.now(), type: "error", text: "Please describe your idea or project (minimum 5 characters)." });
             return false;
         }
 
@@ -61,8 +63,9 @@ function ContactFormComponent() {
             });
 
             setFeedback({
+                id: Date.now(),
                 type: "success",
-                text: "Thank you! Your idea has been sent successfully, and I will get back to you as soon as possible.",
+                text: "Sent! I'll get back to you soon.",
             });
 
             // Reset form on success
@@ -80,6 +83,7 @@ function ContactFormComponent() {
                     : "Failed to send message. Please check your connection and try again.";
 
             setFeedback({
+                id: Date.now(),
                 type: "error",
                 text: errorMessage,
             });
@@ -93,36 +97,25 @@ function ContactFormComponent() {
             onSubmit={handleSubmit}
             className='relative z-7 flex flex-col space-y-[5px] justify-start items-start w-fit'
         >
+            {feedback && (
+                <FeedbackToast
+                    key={feedback.id}
+                    feedback={feedback}
+                    onClose={() => setFeedback(null)}
+                    duration={5}
+                />
+            )}
             <div className="flex flex-row items-center gap-2 px-4 text-white rounded-md py-0 bg-(--brand-green) ring-[#368560] ring-2 ring-offset outline-white outline-2 outline-offset-2">
                 <p className="font-bold text-xl tracking-widest leading-none text-center">CHAT ME</p>
                 <p className="font-accent font-bold text-3xl tracking-tight">24</p>
             </div>
             
             <div className="flex flex-col w-full sm:w-fit bg-(--brand-green) justify-center py-4 px-4 gap-4 text-white rounded-2xl ring-[#368560] ring-2 ring-offset outline-white outline-2 outline-offset-2">
-                {/* Feedback Alert Banner */}
-                {/* {feedback && (
-                    <div
-                        className={`w-full px-4 py-2.5 rounded-lg border text-sm font-display tracking-wide flex items-center justify-between ${
-                            feedback.type === "success"
-                                ? "bg-emerald-950/80 text-emerald-200 border-emerald-400"
-                                : "bg-red-950/80 text-red-200 border-red-400"
-                        }`}
-                    >
-                        <span>{feedback.text}</span>
-                        <button
-                            type="button"
-                            onClick={() => setFeedback(null)}
-                            className="ml-3 text-white/70 hover:text-white cursor-pointer font-bold text-base"
-                            aria-label="Close notification"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                )} */}
+                
 
                 <div className="flex flex-col sm:flex-row gap-8">
-                    <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-4">
                             <label htmlFor="contact-name" className="inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
                                 YOUR NAME
                             </label>
@@ -136,7 +129,7 @@ function ContactFormComponent() {
                                 className="px-4 py-3 bg-black/20 max-w-64 outline-2 outline-white/80 ring-3 ring-black/50 focus:outline-(--brand-yellow) rounded-md disabled:opacity-50"
                             />
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-4">
                             <label htmlFor="contact-email" className="inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
                                 YOUR EMAIL
                             </label>
