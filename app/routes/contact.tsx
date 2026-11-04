@@ -1,5 +1,7 @@
 import type { Route } from "./+types/contact";
-import { ComingSoon } from "~/features/portofolio/sections/Handling/ComingSoon";
+import type { RouteHandle } from "~/types/RouteTypes";
+import { Contact } from "~/features/portofolio/sections/Contact/Contact";
+import { LOGO_EURECSAN } from "~/assets/logos/LOGO_EURECSAN";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,10 +10,16 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+export const handle: RouteHandle = {
+  navbar: {
+    color: "text-(--brand-green)"
+  }
+}
+
 export default function ContactRoute() {
     return (
         <main>
-            <ComingSoon />
+            <Contact />
         </main>
     )
 }

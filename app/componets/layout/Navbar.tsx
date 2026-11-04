@@ -1,5 +1,5 @@
 import { useMatches } from "react-router";
-import LogoHome from "~/assets/logos/LOGO_HOME.svg"
+import { LOGO_EURECSAN } from "~/assets/logos/LOGO_EURECSAN";
 import { SiClearAll } from '@sargamicons/react/fill';
 import { useState } from "react";
 import type { RouteHandle } from "~/types/RouteTypes";
@@ -13,7 +13,7 @@ const navigationItems = [
 
 export function Navbar() {
     const matches = useMatches()
-    const navbarConfig = matches.reduce(
+    const navbarConfig = matches.reduce<NonNullable<RouteHandle["navbar"]>>(
         (config, match) => {
             const routeHandle = match.handle as RouteHandle | undefined;
 
@@ -23,7 +23,6 @@ export function Navbar() {
             };
         },
         {
-            logo: LogoHome,
             color: "text-(--brand-white)",
         }
     );
@@ -33,7 +32,7 @@ export function Navbar() {
         <div className="fixed inset-x-0 top-0 z-50 w-full">
             <nav className={`${navbarConfig.color} px-8 md:px-12 py-6  mx-auto w-full flex items-center justify-between`}>
                 <TransitionLink to="/" aria-label="Ke halaman utama">
-                    <img src={navbarConfig.logo} className="h-12" alt="Logo Home" />
+                    <LOGO_EURECSAN className="h-12 w-auto" />
                 </TransitionLink>
                 <div className="hidden gap-4 lg:flex">
                     {navigationItems.map(menu =>

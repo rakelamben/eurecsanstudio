@@ -2,7 +2,7 @@ import type { RouteHandle } from "~/types/RouteTypes";
 import type { Route } from "./+types/about";
 import { About } from "~/features/portofolio/sections/About/About";
 
-import LogoABout from "~/assets/logos/LOGO_ABOUT.svg"
+import { LOGO_EURECSAN } from "~/assets/logos/LOGO_EURECSAN";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,7 +14,6 @@ export function meta({}: Route.MetaArgs) {
 
 export const handle: RouteHandle = {
   navbar: {
-    logo: LogoABout,
     color: "text-(--brand-red)"
   }
 }

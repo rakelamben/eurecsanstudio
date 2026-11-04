@@ -20,8 +20,7 @@ import { ExperienceDialogContent } from "./ExperienceDialogContent"
 import { InteractiveTrophy } from "./InteractiveTrophy"
 import { AchievementDialogContent } from "./AchievementDialogContent"
 import { Link } from "react-router"
-
-
+import { SiFileDownload } from '@sargamicons/react/fill';
 import { Footer } from "~/componets/layout/Footer"
 import { Dialog } from "~/componets/ui/Dialog"
 import {
@@ -100,7 +99,12 @@ export function About() {
                     <Link to={"https://github.com/rakelamben"} target="_blank" rel="noopener noreferrer">
                         <LogoGithub className="aspect-square max-w-[36px] text-[#B4CDD8] hover:text-[#5EC3F0] transition-colors" />
                     </Link>
+                    <button className="cursor-pointer flex flex-row gap-2 items-center px-4 py-2 bg-[#5EC3F0] text-white font-display text-lg rounded-xl hover:bg-[#009DD6] transition-colors">
+                        <SiFileDownload className="text-2xl" />
+                        Download CV
+                    </button>
                 </div>
+                
                 <section className="w-full relative mb-8 mt-24 md:mt-0">
                     <div className="flex flex-col md:flex-row space-x-12 max-w-[962px] mx-auto px-8">
                         <span className="font-display text-6xl mb-4 md:mb-0">Hi, I'm Eurecsan</span>

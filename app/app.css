@@ -13,11 +13,6 @@
   --brand-yellow: #FED325
 }
 
-html,
-body {
-  scrollbar-gutter: stable;
-}
-
 #smooth-wrapper {
   overflow: hidden;
   position: fixed;

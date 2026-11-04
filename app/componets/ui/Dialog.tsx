@@ -31,6 +31,16 @@ export function Dialog({
     if (!open) return;
 
     const previousOverflow = document.body.style.overflow;
+    const scrollContainer = document.getElementById("smooth-wrapper") ?? document.body;
+    const previousPaddingRight = scrollContainer.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    if (scrollbarWidth > 0) {
+      const currentPaddingRight =
+        Number.parseFloat(window.getComputedStyle(scrollContainer).paddingRight) || 0;
+      scrollContainer.style.paddingRight = `${currentPaddingRight + scrollbarWidth}px`;
+    }
+
     document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -41,6 +51,7 @@ export function Dialog({
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      scrollContainer.style.paddingRight = previousPaddingRight;
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose, open]);

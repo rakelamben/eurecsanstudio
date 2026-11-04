@@ -1,7 +1,7 @@
 import type { Route } from "./+types/home";
 import { Hero } from "~/features/portofolio/sections/Hero/Hero";
 import type { RouteHandle } from "~/types/RouteTypes";
-import LogoHome from "~/assets/logos/LOGO_HOME.svg"
+import { LOGO_EURECSAN } from "~/assets/logos/LOGO_EURECSAN";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,7 +12,6 @@ export function meta({}: Route.MetaArgs) {
 
 export const handle: RouteHandle = {
   navbar: {
-    logo: LogoHome,
     color: "text-(--brand-white)"
   }
 }
