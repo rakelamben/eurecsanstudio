@@ -1,8 +1,8 @@
-import { type SVGProps } from "react";
+import { memo, type SVGProps } from "react";
 
 interface IProps extends SVGProps<SVGSVGElement> { }
 
-export const RailingPanel = (props: IProps) => {
+export const RailingPanel = memo((props: IProps) => {
     return (
         <svg width="1945" height="197" viewBox="0 0 1945 197" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
             <g filter="url(#filter0_i_649_1443)">
@@ -713,4 +713,5 @@ export const RailingPanel = (props: IProps) => {
         </svg>
 
     )
-};
+});
+RailingPanel.displayName = "RailingPanel";

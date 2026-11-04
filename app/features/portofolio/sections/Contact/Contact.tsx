@@ -1,15 +1,234 @@
 import { RailingPanel } from "~/assets/illustrations/RailingPanel";
 import { RoadwaySignGrid } from "~/assets/illustrations/RoadwaySignGrid";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { LogoInstagram } from "~/assets/logos/LOGO_INSTAGRAM"
 import { LogoBehance } from "~/assets/logos/LOGO_BEHANCE"
 import { LogoLinkedin } from "~/assets/logos/LOGO_LINKEDIN"
 import { LogoGithub } from "~/assets/logos/LOGO_GITHUB"
 import { Link } from "react-router"
+import { sendContactEmail, type IdeaType } from "~/lib/emailjs";
+
+function ContactFormComponent() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [ideaType, setIdeaType] = useState<IdeaType>("mobile_dev");
+    const [message, setMessage] = useState("");
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+    const handleClear = () => {
+        setName("");
+        setEmail("");
+        setIdeaType("mobile_dev");
+        setMessage("");
+        setFeedback(null);
+    };
+
+    const validateForm = () => {
+        if (!name.trim() || name.trim().length < 2) {
+            setFeedback({ type: "error", text: "Please enter your name (minimum 2 characters)." });
+            return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.trim() || !emailRegex.test(email.trim())) {
+            setFeedback({ type: "error", text: "Please enter a valid email address." });
+            return false;
+        }
+
+        if (!message.trim() || message.trim().length < 5) {
+            setFeedback({ type: "error", text: "Please describe your idea or project (minimum 5 characters)." });
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setFeedback(null);
+
+        if (!validateForm()) return;
+
+        setIsSubmitting(true);
+        try {
+            await sendContactEmail({
+                name,
+                email,
+                ideaType,
+                message,
+            });
+
+            setFeedback({
+                type: "success",
+                text: "Thank you! Your idea has been sent successfully, and I will get back to you as soon as possible.",
+            });
+
+            // Reset form on success
+            setName("");
+            setEmail("");
+            setIdeaType("mobile_dev");
+            setMessage("");
+        } catch (error: unknown) {
+            console.error("EmailJS Error:", error);
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : typeof error === "object" && error !== null && "text" in error
+                    ? String((error as { text: unknown }).text)
+                    : "Failed to send message. Please check your connection and try again.";
+
+            setFeedback({
+                type: "error",
+                text: errorMessage,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <form
+            onSubmit={handleSubmit}
+            className='relative z-7 flex flex-col space-y-[5px] justify-start items-start w-fit'
+        >
+            <div className="flex flex-row items-center gap-2 px-4 text-white rounded-md py-0 bg-(--brand-green) ring-[#368560] ring-2 ring-offset outline-white outline-2 outline-offset-2">
+                <p className="font-bold text-xl tracking-widest leading-none text-center">CHAT ME</p>
+                <p className="font-accent font-bold text-3xl tracking-tight">24</p>
+            </div>
+            
+            <div className="flex flex-col w-full sm:w-fit bg-(--brand-green) justify-center py-4 px-4 gap-4 text-white rounded-2xl ring-[#368560] ring-2 ring-offset outline-white outline-2 outline-offset-2">
+                {/* Feedback Alert Banner */}
+                {/* {feedback && (
+                    <div
+                        className={`w-full px-4 py-2.5 rounded-lg border text-sm font-display tracking-wide flex items-center justify-between ${
+                            feedback.type === "success"
+                                ? "bg-emerald-950/80 text-emerald-200 border-emerald-400"
+                                : "bg-red-950/80 text-red-200 border-red-400"
+                        }`}
+                    >
+                        <span>{feedback.text}</span>
+                        <button
+                            type="button"
+                            onClick={() => setFeedback(null)}
+                            className="ml-3 text-white/70 hover:text-white cursor-pointer font-bold text-base"
+                            aria-label="Close notification"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                )} */}
+
+                <div className="flex flex-col sm:flex-row gap-8">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="contact-name" className="inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
+                                YOUR NAME
+                            </label>
+                            <input
+                                id="contact-name"
+                                type="text"
+                                placeholder="Enter your name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                disabled={isSubmitting}
+                                className="px-4 py-3 bg-black/20 max-w-64 outline-2 outline-white/80 ring-3 ring-black/50 focus:outline-(--brand-yellow) rounded-md disabled:opacity-50"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="contact-email" className="inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
+                                YOUR EMAIL
+                            </label>
+                            <input
+                                id="contact-email"
+                                type="email"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={isSubmitting}
+                                className="px-4 py-3 bg-black/20 max-w-64 outline-2 outline-white/80 ring-3 ring-black/50 focus:outline-(--brand-yellow) rounded-md disabled:opacity-50"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col items-start md:flex-row md:items-center md:justify-between gap-2">
+                            <span className="h-fit inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
+                                YOUR IDEA
+                            </span>
+                            <div className="inline-flex rounded-lg bg-black/40 p-1 border border-white/30 shadow-inner w-fit">
+                                <button
+                                    type="button"
+                                    onClick={() => setIdeaType("mobile_dev")}
+                                    disabled={isSubmitting}
+                                    className={`cursor-pointer px-3 py-1 rounded-md font-display text-xs md:text-sm tracking-wider uppercase transition-all ${
+                                        ideaType === "mobile_dev"
+                                            ? "bg-(--brand-yellow) text-black font-bold shadow ring-1 ring-white"
+                                            : "text-white/80 hover:text-white hover:bg-white/10"
+                                    } disabled:opacity-50`}
+                                >
+                                    MOBILE DEV
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIdeaType("website_dev")}
+                                    disabled={isSubmitting}
+                                    className={`cursor-pointer px-3 py-1 rounded-md font-display text-xs md:text-sm tracking-wider uppercase transition-all ${
+                                        ideaType === "website_dev"
+                                            ? "bg-(--brand-yellow) text-black font-bold shadow ring-1 ring-white"
+                                            : "text-white/80 hover:text-white hover:bg-white/10"
+                                    } disabled:opacity-50`}
+                                >
+                                    WEBSITE DEV
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIdeaType("ai_integration")}
+                                    disabled={isSubmitting}
+                                    className={`cursor-pointer px-3 py-1 rounded-md font-display text-xs md:text-sm tracking-wider uppercase transition-all ${
+                                        ideaType === "ai_integration"
+                                            ? "bg-(--brand-yellow) text-black font-bold shadow ring-1 ring-white"
+                                            : "text-white/80 hover:text-white hover:bg-white/10"
+                                    } disabled:opacity-50`}
+                                >
+                                    AI INTEGRATION
+                                </button>
+                            </div>
+                        </div>
+                        <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            disabled={isSubmitting}
+                            className="h-[10rem] md:w-[32rem] md:h-full bg-black/20 outline-2 outline-white/80 ring-3 ring-black/50 focus:outline-(--brand-yellow) rounded-md p-4 resize-none disabled:opacity-50"
+                            placeholder="Describe your idea or project here..."
+                        />
+                    </div>
+                </div>
+                <div className="flex flex-row items-center justify-end w-full gap-4">
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        disabled={isSubmitting}
+                        className="text-white font-display tracking-wider cursor-pointer text-md w-fit hover:opacity-80 disabled:opacity-50"
+                    >
+                        Clear
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="text-(--brand-yellow) font-display tracking-wider cursor-pointer text-md w-fit hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                    >
+                        {isSubmitting ? "SENDING..." : "SEND MESSAGE"}
+                    </button>
+                </div>
+            </div>
+        </form>
+    );
+}
+
+const ContactForm = memo(ContactFormComponent);
 
 export function Contact() {
-    const [ideaType, setIdeaType] = useState<"mobile_dev" | "website_dev" | "ai_integration">("mobile_dev");
-
     return (
         <>
             <div className="pt-[4rem]">
@@ -19,80 +238,7 @@ export function Contact() {
                     </div>
                     <div className="w-full relative mb-8 -mt-10">
                         <div className="flex flex-col items-center max-w-[min(92vw,620px)] mx-auto gap-4 z-10 relative">
-                            <div className='relative z-7 flex flex-col space-y-[5px] justify-start items-start w-fit'>
-                                <div className="flex flex-row items-center gap-2 px-4 text-white rounded-md py-0 bg-(--brand-green) ring-[#368560] ring-2 ring-offset outline-white outline-2 outline-offset-2">
-                                    <p className="font-bold text-xl tracking-widest leading-none text-center">CHAT ME</p>
-                                    <p className="font-accent font-bold text-3xl tracking-tight">24</p>
-                                </div>
-                                
-                                    <div className="flex flex-col w-full sm:w-fit bg-(--brand-green) justify-center py-4 px-4 gap-4 text-white rounded-2xl">
-                                        <div className="flex flex-col sm:flex-row gap-8">
-                                            <div className="flex flex-col gap-4">
-                                                <div className="flex flex-col gap-2">
-                                                    <span className="inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
-                                                        {"YOUR NAME"}
-                                                    </span>
-                                                    <input type="text" placeholder="Enter your name" className="px-4 py-3 bg-black/20 max-w-64 outline-2 outline-white/80 ring-3 ring-black/50  focus:outline-2 focus:outline-(--brand-yellow) transition-colors rounded-md" />
-                                                </div>
-                                                <div className="flex flex-col gap-2">
-                                                    <span className="inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
-                                                        {"YOUR EMAIL"}
-                                                    </span>
-                                                    <input type="text" placeholder="Enter your email" className="px-4 py-3 bg-black/20 max-w-64 outline-2 outline-white/80 ring-3 ring-black/50  focus:outline-2 focus:outline-(--brand-yellow) transition-colors rounded-md" />
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col gap-4">
-                                                <div className="flex flex-col items-start md:flex-row md:items-center md:justify-between gap-2">
-                                                    <span className="h-fit inline-block bg-(--brand-yellow) text-black font-display font-bold text-sm px-2.5 py-1 rounded shadow-xs tracking-widest w-fit">
-                                                        {"YOUR IDEA"}
-                                                    </span>
-                                                    <div className="inline-flex rounded-lg bg-black/40 p-1 border border-white/30 shadow-inner w-fit">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setIdeaType("mobile_dev")}
-                                                            className={`cursor-pointer px-3 py-1 rounded-md font-display text-xs md:text-sm tracking-wider uppercase transition-all ${ideaType === "mobile_dev"
-                                                                ? "bg-(--brand-yellow) text-black font-bold shadow ring-1 ring-white"
-                                                                : "text-white/80 hover:text-white hover:bg-white/10"
-                                                                }`}
-                                                        >
-                                                            MOBILE DEV
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setIdeaType("website_dev")}
-                                                            className={`cursor-pointer px-3 py-1 rounded-md font-display text-xs md:text-sm tracking-wider uppercase transition-all ${ideaType === "website_dev"
-                                                                ? "bg-(--brand-yellow) text-black font-bold shadow ring-1 ring-white"
-                                                                : "text-white/80 hover:text-white hover:bg-white/10"
-                                                                }`}
-                                                        >
-                                                            WEBSITE DEV
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setIdeaType("ai_integration")}
-                                                            className={`cursor-pointer px-3 py-1 rounded-md font-display text-xs md:text-sm tracking-wider uppercase transition-all ${ideaType === "ai_integration"
-                                                                ? "bg-(--brand-yellow) text-black font-bold shadow ring-1 ring-white"
-                                                                : "text-white/80 hover:text-white hover:bg-white/10"
-                                                                }`}
-                                                        >
-                                                            AI INTEGRATION
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <textarea className="h-[10rem] md:w-[32rem] md:h-full bg-black/20 outline-2 outline-white/80 ring-3 ring-black/50  focus:outline-2 focus:outline-(--brand-yellow) transition-colors rounded-md p-4 resize-none" placeholder="Describe your idea or project here..." />
-                                            </div>
-
-                                        </div>
-                                        <div className="flex flex-row items-center justify-end w-full gap-4">
-                                            <button className="text-white font-display tracking-wider cursor-pointer text-md w-fit">
-                                                Clear
-                                            </button>
-                                            <button className="text-(--brand-yellow) font-display tracking-wider cursor-pointer text-md w-fit">
-                                                SEND MESSAGE
-                                            </button>
-                                        </div>
-                                    </div>
-                            </div>
+                            <ContactForm />
                             <RoadwaySignGrid className="relative z-5 -mt-10" />
                         </div>
 
@@ -120,5 +266,5 @@ export function Contact() {
                 </section>
             </div>
         </>
-    )
+    );
 }

@@ -1,8 +1,8 @@
-import { type SVGProps } from "react";
+import { memo, type SVGProps } from "react";
 
 interface IProps extends SVGProps<SVGSVGElement> {}
 
-export const RoadwaySignGrid = (props: IProps) => {
+export const RoadwaySignGrid = memo((props: IProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -166,4 +166,5 @@ export const RoadwaySignGrid = (props: IProps) => {
       </defs>
     </svg>
   );
-};
+});
+RoadwaySignGrid.displayName = "RoadwaySignGrid";
