@@ -99,9 +99,11 @@ export function About() {
                     <Link to={"https://github.com/rakelamben"} target="_blank" rel="noopener noreferrer">
                         <LogoGithub className="aspect-square max-w-[36px] text-[#B4CDD8] hover:text-[#5EC3F0] transition-colors" />
                     </Link>
-                    <button className="cursor-pointer flex flex-row gap-2 items-center px-4 py-2 bg-[#5EC3F0] text-white font-display text-lg rounded-xl hover:bg-[#009DD6] transition-colors">
-                        <SiFileDownload className="text-2xl" />
-                        Download CV
+                    <button className="cursor-pointer  gap-2 items-center px-4 py-2 bg-[#5EC3F0] text-white font-display text-lg rounded-xl hover:bg-[#009DD6] transition-colors">
+                        <a href="/CV_EURECSAN.pdf" target="_blank" rel="noopener noreferrer" className="flex flex-row gap-2 items-center">
+                            <SiFileDownload className="text-2xl" />
+                            Download CV
+                        </a>
                     </button>
                 </div>
                 

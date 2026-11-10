@@ -15,8 +15,7 @@ export const eurecsanWorks: EurecsanWorksProps[] = [
         period: "2025 - 2026",
         status: "PARTTIME",
         jobdesc: [
-            "Refactored legacy code into modern reusable component architecture.",
-            "Mentored junior members in modern JavaScript, TypeScript, and CSS styling.",
+            "Managed day-to-day outlet operations, including product preparation, delivery, cashier and waiter duties, and outlet maintenance and cleaning."
         ],
     },
     {
@@ -26,9 +25,9 @@ export const eurecsanWorks: EurecsanWorksProps[] = [
         period: "2024-2024",
         status: "FULLTIME",
         jobdesc: [
-            "Built apps using Flutter and React Native with modular state management.",
-            "Implemented smooth animations and device-specific integrations (camera, geolocation, offline caching).",
-            "Tested and optimized responsiveness across multiple screen densities.",
+            "Created and developed quality assurance standards for functional and non-functional testing of software released by the company's ICT team.",
+            "Designed the user interface standards for the company's ERP system, applied across the release of work system modules.",
+            "Conducted cross-team reviews with each division's UI/UX team to ensure the system's UI/UX quality and compliance with the defined standards.",
         ],
     },
     {
@@ -38,9 +37,9 @@ export const eurecsanWorks: EurecsanWorksProps[] = [
         period: "2023 - 2024",
         status: "INTERN",
         jobdesc: [
-            "Crafted modern frontend experiences using React, React Router, Tailwind CSS, and Motion.",
-            "Designed design systems, wireframes, and interactive prototypes in Figma.",
-            "Built robust APIs and backend services integrating databases and third-party services.",
+            "Consulted with users and conducted requirements analysis to define the features and workflows of ERP modules.",
+            "Fixed bugs in specific modules and refactored modules that were causing excessive server resource consumption.",
+            "Developed new ERP modules based on user needs and the principles of effectiveness and process efficiency.",
         ],
     },
 ];

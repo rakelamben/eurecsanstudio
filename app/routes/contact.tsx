@@ -5,7 +5,7 @@ import { LOGO_EURECSAN } from "~/assets/logos/LOGO_EURECSAN";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Contact | Portfolio" },
+    { title: "Contact | Eurecsan" },
     { name: "description", content: "Get Connected With Me" },
   ];
 }

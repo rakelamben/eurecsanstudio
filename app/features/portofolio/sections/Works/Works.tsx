@@ -1,5 +1,7 @@
 export function Works() {
     return (
-        <main>Works</main>
+        <section className="w-full relative h-fit mb-8 bg-(--brand-red)">
+            
+        </section>
     )
 }

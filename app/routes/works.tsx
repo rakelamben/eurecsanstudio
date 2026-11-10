@@ -1,17 +1,24 @@
+import { Works } from "~/features/portofolio/sections/Works/Works";
 import type { Route } from "./+types/works";
-import { ComingSoon } from "~/features/portofolio/sections/Handling/ComingSoon";
+import type { RouteHandle } from "~/types/RouteTypes";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Works | Portfolio" },
+    { title: "Works | Eurecsan" },
     { name: "description", content: "My Lifetime Works" },
   ];
+}
+
+export const handle: RouteHandle = {
+  navbar: {
+    color: "text-(--brand-black)"
+  }
 }
 
 export default function WorksRoute() {
     return (
         <main>
-            <ComingSoon />
+            <Works />
         </main>
     )
 }
