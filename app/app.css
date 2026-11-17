@@ -6,12 +6,20 @@
   --font-accent: "Lexend", Impact, sans-serif;
 }
 
+@layer base {
+  html,
+  * {
+    @apply scrollbar-thin scrollbar-thumb-(--brand-blue) scrollbar-track-transparent;
+  }
+}
+
 :root {
   --brand-red: #F02D19;
   --brand-white: #FCFEFF;
   --brand-green:#046738;
   --brand-yellow: #FED325;
   --brand-black: #000000;
+  --brand-blue: #29B0E1;
 }
 
 #smooth-wrapper {

@@ -68,53 +68,61 @@ export function Dialog({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onMouseDown={onClose}
           />
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={title ? titleId : undefined}
-            className={`fixed left-1/2 top-1/2 z-[110] max-h-[min(85vh,680px)] w-[min(92vw,620px)]  -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-(--brand-green) rounded-lg scrollbar-thin scrollbar-thumb-(--brand-yellow) scrollbar-track-(--brand-green) ${className}`}
-            initial={{ opacity: 0, scale: 0.94, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 8 }}
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 35,
-            }}
-            onMouseDown={(event) => event.stopPropagation()}
+          <motion.div  className="fixed inset-0 z-[110] overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-(--brand-yellow) scrollbar-track-transparent"
+                onMouseDown={onClose}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}  
           >
-            <div className={`relative ${wrapperClassName}`}>
-              <button type="button"
-                onClick={onClose}
-                aria-label={closeLabel}
-                className="absolute right-[-10px] top-0 bg-transparent w-12 cursor-pointer -rotate-10">
-                {/* Sticker */}
-                <div className="relative bg-(--brand-red) p-2 shadow-md [clip-path:polygon(0_0,100%_0,100%_100%,1rem_100%,0_calc(100%_-_1rem))]"
-                >
-                  <SiClose className="w-full h-auto text-white" />
+            <div className="flex min-h-full flex-col items-center justify-center p-4">
 
-                  {/* Folded corner */}
-                  <span
-                    className="pointer-events-none absolute bottom-0 left-0 h-4 w-4
-              bg-gray-300
-              [clip-path:polygon(0_0,80%_0,100%_100%)]"
-                  />
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={title ? titleId : undefined}
+                className={`relative my-auto w-[min(92vw,800px)] shrink-0 bg-(--brand-green) rounded-lg ${className}`}
+                initial={{ opacity: 0, scale: 0.94, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 8 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 35,
+                }}
+                onMouseDown={(event) => event.stopPropagation()}
+              >
+                <div className={`relative ${wrapperClassName}`}>
+                  <button type="button"
+                    onClick={onClose}
+                    aria-label={closeLabel}
+                    className="absolute right-[-10px] top-0 bg-transparent w-12 cursor-pointer -rotate-10">
+                    {/* Sticker */}
+                    <div className="relative bg-(--brand-red) p-2 shadow-md [clip-path:polygon(0_0,100%_0,100%_100%,1rem_100%,0_calc(100%_-_1rem))]"
+                    >
+                      <SiClose className="w-full h-auto text-white" />
+
+                      {/* Folded corner */}
+                      <span
+                        className="pointer-events-none absolute bottom-0 left-0 h-4 w-4
+                  bg-gray-300
+                  [clip-path:polygon(0_0,80%_0,100%_100%)]"
+                      />
+                    </div>
+                  </button>
+                    {title && (
+                    <div className="flex items-start px-4 mr-2 pt-6 text-white">
+                        <h2 id={titleId} className="font-display text-3xl leading-none">
+                          {title}
+                        </h2>
+                    </div>
+                    )}
+                  <div className="">{children}</div>
                 </div>
-              </button>
-              <div className="flex items-start px-4 mx-2 pt-6 text-white">
-                {title ? (
-                  <h2 id={titleId} className="font-display text-3xl leading-none">
-                    {title}
-                  </h2>
-                ) : (
-                  <span />
-                )}
-              </div>
-              <div className="px-4 mx-2 mt-3 mb-2">{children}</div>
+              </motion.div>
             </div>
           </motion.div>
+
         </>
       )}
     </AnimatePresence>,

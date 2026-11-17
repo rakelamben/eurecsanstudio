@@ -11,7 +11,7 @@ export function meta({}: Route.MetaArgs) {
 
 export const handle: RouteHandle = {
   navbar: {
-    color: "text-(--brand-black)"
+    color: "text-(--brand-red)"
   }
 }
 

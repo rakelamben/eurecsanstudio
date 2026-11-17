@@ -257,7 +257,7 @@ export function About() {
                     </div>
                 </div>
                 {activeService && (
-                    <div className="space-y-6 z-5 text-white">
+                    <div className="px-4 space-y-6 z-5 text-white">
                         <p className="text-lg leading-relaxed">
                             {activeService.description}
                         </p>
@@ -278,7 +278,7 @@ export function About() {
                 className="!w-[min(94vw,900px)] !max-w-[900px]"
                 wrapperClassName="overflow-hidden pb-4"
             >
-                <div className="z-5 mt-4">
+                <div className="px-4 mt-4">
                     <ExperienceDialogContent />
                 </div>
             </Dialog>
@@ -289,7 +289,7 @@ export function About() {
                 className="!w-[min(94vw,900px)] !max-w-[900px]"
                 wrapperClassName="overflow-hidden pb-4"
             >
-                <div className="z-5 mt-4">
+                <div className="px-4 mt-4">
                     <AchievementDialogContent />
                 </div>
             </Dialog>
